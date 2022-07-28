@@ -18,6 +18,7 @@ namespace Translate
         public event KeyPressEventHandler KeyPressEvent;
         public event System.Windows.Forms.KeyEventHandler KeyUpEvent;
 
+
         public delegate int HookProc(int nCode, Int32 wParam, IntPtr lParam);
         static int hKeyboardHook = 0; //声明键盘钩子处理的初始值
         //值在Microsoft SDK的Winuser.h里查询
@@ -34,12 +35,10 @@ namespace Translate
             public int time; // 指定的时间戳记的这个讯息
             public int dwExtraInfo; // 指定额外信息相关的信息
         }
-        //使用此功能，安装了一个钩子
+        //安装了一个钩子
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern int SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
-
-
-        //调用此函数卸载钩子
+        //卸载钩子
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern bool UnhookWindowsHookEx(int idHook);
 
