@@ -40,6 +40,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Text.Encodings.Web, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.4.5.1\lib\netstandard1.0\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,8 +52,12 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="TencentCloud, Version=3.0.576.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TencentCloudSDK.3.0.576\lib\net45\TencentCloud.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AESLock.cs" />
     <Compile Include="ClipBoard.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -70,6 +77,7 @@
       <DependentUpon>TipForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Translate\BaiduEngine\TranslateEngineBaidu.cs" />
+    <Compile Include="Translate\TencentEngine\TranslateEngineTencent.cs" />
     <Compile Include="Translate\TranslateEngineBase.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

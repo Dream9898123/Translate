@@ -12,6 +12,11 @@ namespace Translate.Translate.BaiduEngine
 {
     public class TranslateEngineBaidu : TranslateEngineBase
     {
+        public TranslateEngineBaidu()
+        {
+            this.Name = "百度引擎";
+            this.ReadIdAndKey();
+        }
         TranClass tranClass;
         public override string GetResult(string translateValue)
         {
@@ -26,9 +31,9 @@ namespace Translate.Translate.BaiduEngine
             try
             {
                 WebClient client = new WebClient();  //引用System.Net
-                string appid = "20220727001284716";//改成自己的APP ID
+                string appid = this.sourceId;//改成自己的APP ID
                 string rand = DateTime.Now.ToString("yyyyMMddhhmmss"); //这个是随机数,不用改
-                string key = "VMGXEqfXpGNRcRPStFcy"; //改成自己的密钥
+                string key = this.sourceKey; //改成自己的密钥
                 string CmdStr = $"{appid}{BeforeStr}{rand}{key}";
                 byte[] result = Encoding.UTF8.GetBytes(CmdStr);
                 MD5 md5 = new MD5CryptoServiceProvider();

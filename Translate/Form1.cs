@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Translate.Translate;
 using Translate.Translate.BaiduEngine;
+using Translate.Translate.TencentEngine;
 
 namespace Translate
 {
@@ -23,6 +26,8 @@ namespace Translate
         private TipForm tipForm;
         private KeyboardEvent k_event;
         private TranslateEngineBase translateEngineBase;
+
+        private Hashtable htTranslateEngineBase;
         public 代码翻译小工具()
         {
             InitializeComponent();
@@ -43,22 +48,75 @@ namespace Translate
 
             k_event = new KeyboardEvent();
 
-            translateEngineBase = new TranslateEngineBaidu();
+            //translateEngineBase = new TranslateEngineBaidu();
+            //translateEngineBase = new TranslateEngineTencent();
             settingbuttons = MouseButtons.Middle;
 
             this.comboBox1.SelectedIndex = 2;
+            htTranslateEngineBase = new Hashtable();
+            List<TranslateEngineBase> translateEngineBases = GetManager<TranslateEngineBase>(typeof(TranslateEngineBase));
+            foreach(TranslateEngineBase t in translateEngineBases)
+            {
+                htTranslateEngineBase.Add(t.Name,t);
+                this.comboBox2.Items.Add(t.Name);
+            }
+            this.comboBox2.SelectedIndex = 0;
         }
         private MouseButtons settingbuttons;
-        //
+        private System.Threading.Thread taskStr;
+        private string lastStr = string.Empty;
+        private string lastTranlate = string.Empty;
         private void hook_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == settingbuttons)
             {
-                string translateValue = c_board.GetClipBoardStr();
-                string translateResult = translateEngineBase.GetResult(translateValue);
-                c_board.SetClipBoardStr(translateResult);
+                if (taskStr != null)
+                    taskStr.Abort();
+                taskStr = new Thread(new System.Threading.ThreadStart(GetTranslateResult));
+                taskStr.SetApartmentState(System.Threading.ApartmentState.STA);
+                taskStr.Start();
             }
         }
+        private static List<T> GetManager<T>(Type type)
+        {
+            List<T> listManager = new List<T>();
+            List<Type> listTypes = GetSubClassNames(type);
+            foreach (Type t in listTypes)
+            {
+                listManager.Add((T)System.Activator.CreateInstance(t));
+            }
+            return listManager;
+        }
+        public static List<Type> GetSubClassNames(Type parentType)
+        {
+            var subTypeList = new List<Type>();
+            var assembly = parentType.Assembly;//获取当前父类所在的程序集``
+            var assemblyAllTypes = assembly.GetTypes();//获取该程序集中的所有类型
+            foreach (var itemType in assemblyAllTypes)//遍历所有类型进行查找
+            {
+                var baseType = itemType.BaseType;//获取元素类型的基类
+                if (baseType != null)//如果有基类
+                {
+                    if (baseType.Name == parentType.Name)//如果基类就是给定的父类
+                    {
+                        subTypeList.Add(itemType);//加入子类表中
+                    }
+                }
+            }
+            return subTypeList;//获取所有子类类型的名称
+        }
+        private void GetTranslateResult()
+        {
+            string translateValue = c_board.GetClipBoardStr();
+            if ((!lastStr.Equals(translateValue) || string.IsNullOrEmpty(lastTranlate)) && !lastTranlate.Equals(translateValue))
+            {
+                string translateResult = translateEngineBase.GetResult(translateValue);
+                c_board.SetClipBoardStr(translateResult);
+                lastStr = translateValue;
+                lastTranlate = translateResult;
+            }
+        }
+
         //private void hook_KeyDown(object sender, KeyEventArgs e)
         //{
         //    //判断按下的键（Ctrl + T）
@@ -305,6 +363,35 @@ namespace Translate
                         this.comboBox1.SelectedIndex = 4;
                         break;
                     }
+            }
+        }
+        public void SaveSourceIdKey(string sourceId,string sourceKey)
+        {
+            string sourcePeakAndconT = sourceId + "/r/n";
+            sourcePeakAndconT += sourceKey + "/r/n";
+
+            string path = Directory.GetCurrentDirectory();
+            File.WriteAllText(Path.Combine(path, "Source.txt"), sourcePeakAndconT);
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.comboBox2.SelectedItem != null)
+            {
+                this.translateEngineBase = (TranslateEngineBase)htTranslateEngineBase[this.comboBox2.SelectedItem.ToString()];
+                if (translateEngineBase != null)
+                {
+                    this.textBox1.Text = this.translateEngineBase.sourceId;
+                    this.textBox2.Text = this.translateEngineBase.sourceKey;
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (this.translateEngineBase != null)
+            {
+                this.translateEngineBase.Init(this.textBox1.Text, this.textBox2.Text);
             }
         }
     }
