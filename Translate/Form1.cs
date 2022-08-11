@@ -49,6 +49,7 @@ namespace Translate
             this.comboBox1.SelectedIndex = 2;
         }
         private MouseButtons settingbuttons;
+        //
         private void hook_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == settingbuttons)
