@@ -22,7 +22,7 @@ namespace Translate.Translate.BaiduEngine
         {
             tranClass = new TranClass();
             tranClass.From = "zh";
-            tranClass.To = "en";
+            tranClass.To = "ru";
             return GetTransReslut(translateValue);
         }
         public string GetTransReslut(string BeforeStr)
@@ -46,7 +46,7 @@ namespace Translate.Translate.BaiduEngine
                 JsonTextReader jsonReader = new JsonTextReader(sr);  //引用Newtonsoft.Json 自带
                 JsonSerializer serializer = new JsonSerializer();
                 var r = serializer.Deserialize<TranClass>(jsonReader); //Json转换成结果类
-                resultStr = base.GetResult(r.Trans_result[0].dst);
+                resultStr = (r.Trans_result[0].dst);
             }
             catch(Exception ex)
             {

@@ -174,8 +174,8 @@ namespace Translate
 
             //相对路径
             //这个是程序根目录下面的一张图片demo.ico
-            string path = System.IO.Path.Combine((Application.StartupPath + @"\"), "demo.ico");
-            notifyIcon.Icon = new System.Drawing.Icon(path);
+            //string path = System.IO.Path.Combine((Application.StartupPath + @"\"), "demo.ico");
+            //notifyIcon.Icon = new System.Drawing.Icon(path);
 
             //绝对路径
             // notifyIcon.Icon = new System.Drawing.Icon("E:/ASP项目/images/3.5 inch Floppy.ico");  
@@ -393,6 +393,55 @@ namespace Translate
             {
                 this.translateEngineBase.Init(this.textBox1.Text, this.textBox2.Text);
             }
+        }
+
+        private void btnFilePath_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                this.txtFilePath.Text = openFileDialog.FileName;
+            }
+        }
+
+        private string[] Filters = new[] { "进样口1", "进样口2", "检测器1", "检测器2", "检测器3" };
+        private void btnDeal_Click(object sender, EventArgs e)
+        {
+            var texts = File.ReadAllLines(this.txtFilePath.Text);
+            foreach (var text in texts)
+            {
+                if (Filters.Any(filter => text.Contains(filter)))
+                {
+                    this.txtResult.Text += text + Environment.NewLine;
+                }
+                else
+                {
+                    var splitsText = text.Split(new char[] { '=' });
+                    if (splitsText.Length < 2 || string.IsNullOrEmpty(splitsText[1]))
+                    {
+                        var translateResult = translateEngineBase.GetResult(splitsText[0]);
+                        if (translateResult.Equals(splitsText[0]))
+                        {
+                            this.txtResult.Text += text + Environment.NewLine;
+                        }
+                        else
+                        {
+                            var result = splitsText[0] + "=" + translateResult;
+                            this.txtResult.Text += result + Environment.NewLine;
+                        }
+                        Thread.Sleep(3000);
+                    }
+                    else
+                    {
+                        txtResult.Text += text + Environment.NewLine;
+                    }
+                }
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            this.txtResult.Text = "";
         }
     }
 }
